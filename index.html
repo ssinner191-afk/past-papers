@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Past Papers 🇸🇸</title>
 
     <style>
@@ -22,7 +23,7 @@
             background: #111827;
             color: white;
             text-align: center;
-            padding: 30px 15px;
+            padding: 28px 15px;
         }
 
         header h1 {
@@ -31,14 +32,14 @@
         }
 
         header p {
-            font-size: 15px;
             color: #d1d5db;
+            font-size: 15px;
         }
 
         .container {
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 0 20px;
+            max-width: 650px;
+            margin: 25px auto;
+            padding: 0 18px;
         }
 
         .welcome {
@@ -47,30 +48,66 @@
         }
 
         .welcome h2 {
+            font-size: 26px;
             margin-bottom: 8px;
         }
 
-        .school-button {
-            width: 100%;
-            padding: 22px;
-            margin: 12px 0;
-            border: none;
-            border-radius: 15px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            background: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .welcome p {
+            font-size: 17px;
         }
 
-        .school-button:hover {
-            transform: translateY(-2px);
+        .school-button,
+        .class-button,
+        .subject-button {
+            width: 100%;
+            border: none;
+            border-radius: 15px;
+            background: white;
+            margin: 10px 0;
+            padding: 20px;
+            font-size: 19px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+        }
+
+        .school-button {
+            padding: 25px;
+            font-size: 21px;
+        }
+
+        .school-button small {
+            font-size: 15px;
+            font-weight: normal;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .back {
+            display: inline-block;
+            border: none;
+            background: #111827;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .optional {
+            display: block;
+            margin-top: 5px;
+            font-size: 13px;
+            color: #777;
+            font-weight: normal;
         }
 
         footer {
             text-align: center;
-            margin-top: 40px;
-            padding: 20px;
+            padding: 30px 15px;
             color: #666;
             font-size: 13px;
         }
@@ -79,35 +116,163 @@
 
 <body>
 
-    <header>
-        <h1>PAST PAPERS 🇸🇸</h1>
-        <p>Study • Practice • Succeed</p>
-    </header>
+<header>
+    <h1>PAST PAPERS 🇸🇸</h1>
+    <p>Study • Practice • Succeed</p>
+</header>
 
-    <div class="container">
+<div class="container" id="app"></div>
 
+<footer>
+    © 2026 Past Papers 🇸🇸
+</footer>
+
+<script>
+
+const primarySubjects = [
+    "English",
+    "Mathematics",
+    "Science",
+    "Social Studies",
+    "CRE"
+];
+
+const secondarySubjects = [
+    "Biology",
+    "Chemistry",
+    "Citizenship",
+    "CRE",
+    "English",
+    "Geography",
+    "History",
+    "ICT",
+    "Kiswahili",
+    "Mathematics",
+    "Physics",
+    "Additional Mathematics"
+];
+
+const app = document.getElementById("app");
+
+function home() {
+    app.innerHTML = `
         <div class="welcome">
             <h2>Welcome! 📚</h2>
             <p>Choose your school level</p>
         </div>
 
-        <button class="school-button">
+        <button class="school-button" onclick="showClasses('primary')">
             🧒 PRIMARY
             <br>
             <small>P1 — P8</small>
         </button>
 
-        <button class="school-button">
+        <button class="school-button" onclick="showClasses('secondary')">
             🎓 SECONDARY
             <br>
             <small>S1 — S4</small>
         </button>
+    `;
+}
 
-    </div>
+function showClasses(level) {
 
-    <footer>
-        © 2026 Past Papers 🇸🇸
-    </footer>
+    let classes = [];
+
+    if (level === "primary") {
+        for (let i = 1; i <= 8; i++) {
+            classes.push("P" + i);
+        }
+    } else {
+        for (let i = 1; i <= 4; i++) {
+            classes.push("S" + i);
+        }
+    }
+
+    let html = `
+        <button class="back" onclick="home()">← Back</button>
+
+        <div class="welcome">
+            <h2>${level === "primary" ? "PRIMARY SCHOOL 📚" : "SECONDARY SCHOOL 🎓"}</h2>
+            <p>Choose your class</p>
+        </div>
+    `;
+
+    classes.forEach(cls => {
+        html += `
+            <button class="class-button" onclick="showSubjects('${level}', '${cls}')">
+                ${cls}
+            </button>
+        `;
+    });
+
+    app.innerHTML = html;
+}
+
+function showSubjects(level, cls) {
+
+    const subjects =
+        level === "primary"
+        ? primarySubjects
+        : secondarySubjects;
+
+    let html = `
+        <button class="back" onclick="showClasses('${level}')">← Back</button>
+
+        <div class="welcome">
+            <h2>${cls} 📚</h2>
+            <p>Choose a subject</p>
+        </div>
+    `;
+
+    subjects.forEach(subject => {
+
+        let optionalText = "";
+
+        if (
+            subject === "Additional Mathematics" &&
+            (cls === "S3" || cls === "S4")
+        ) {
+            optionalText = `<span class="optional">Optional subject</span>`;
+        }
+
+        html += `
+            <button class="subject-button"
+                onclick="openSubject('${cls}', '${subject}')">
+
+                ${subject}
+                ${optionalText}
+
+            </button>
+        `;
+    });
+
+    app.innerHTML = html;
+}
+
+function openSubject(cls, subject) {
+
+    app.innerHTML = `
+        <button class="back" onclick="showSubjects(
+            '${cls.startsWith("P") ? "primary" : "secondary"}',
+            '${cls}'
+        )">← Back</button>
+
+        <div class="welcome">
+            <h2>${subject}</h2>
+            <p>${cls}</p>
+        </div>
+
+        <div class="welcome">
+            <h3>Past examination papers</h3>
+            <p>📄 Papers will be added here.</p>
+        </div>
+    `;
+}
+
+home();
+
+</script>
 
 </body>
-  </html>
+</html>

@@ -149,12 +149,14 @@ const secondarySubjects = [
     "Kiswahili",
     "Mathematics",
     "Physics",
+    "Agriculture",
     "Additional Mathematics"
 ];
 
 const app = document.getElementById("app");
 
 function home() {
+
     app.innerHTML = `
         <div class="welcome">
             <h2>Welcome! 📚</h2>
@@ -175,53 +177,81 @@ function home() {
     `;
 }
 
+
 function showClasses(level) {
 
     let classes = [];
 
     if (level === "primary") {
+
         for (let i = 1; i <= 8; i++) {
             classes.push("P" + i);
         }
+
     } else {
+
         for (let i = 1; i <= 4; i++) {
             classes.push("S" + i);
         }
+
     }
 
     let html = `
         <button class="back" onclick="home()">← Back</button>
 
         <div class="welcome">
-            <h2>${level === "primary" ? "PRIMARY SCHOOL 📚" : "SECONDARY SCHOOL 🎓"}</h2>
+
+            <h2>
+                ${level === "primary"
+                    ? "PRIMARY SCHOOL 📚"
+                    : "SECONDARY SCHOOL 🎓"}
+            </h2>
+
             <p>Choose your class</p>
+
         </div>
     `;
 
     classes.forEach(cls => {
+
         html += `
-            <button class="class-button" onclick="showSubjects('${level}', '${cls}')">
+            <button
+                class="class-button"
+                onclick="showSubjects('${level}', '${cls}')">
+
                 ${cls}
+
             </button>
         `;
+
     });
 
     app.innerHTML = html;
 }
 
+
 function showSubjects(level, cls) {
 
     const subjects =
         level === "primary"
-        ? primarySubjects
-        : secondarySubjects;
+            ? primarySubjects
+            : secondarySubjects;
 
     let html = `
-        <button class="back" onclick="showClasses('${level}')">← Back</button>
+        <button
+            class="back"
+            onclick="showClasses('${level}')">
+
+            ← Back
+
+        </button>
 
         <div class="welcome">
+
             <h2>${cls} 📚</h2>
+
             <p>Choose a subject</p>
+
         </div>
     `;
 
@@ -233,42 +263,71 @@ function showSubjects(level, cls) {
             subject === "Additional Mathematics" &&
             (cls === "S3" || cls === "S4")
         ) {
-            optionalText = `<span class="optional">Optional subject</span>`;
+
+            optionalText =
+                `<span class="optional">
+                    Optional subject
+                </span>`;
+
         }
 
         html += `
-            <button class="subject-button"
+            <button
+                class="subject-button"
                 onclick="openSubject('${cls}', '${subject}')">
 
                 ${subject}
+
                 ${optionalText}
 
             </button>
         `;
+
     });
 
     app.innerHTML = html;
 }
 
+
 function openSubject(cls, subject) {
 
+    const level =
+        cls.startsWith("P")
+            ? "primary"
+            : "secondary";
+
     app.innerHTML = `
-        <button class="back" onclick="showSubjects(
-            '${cls.startsWith("P") ? "primary" : "secondary"}',
-            '${cls}'
-        )">← Back</button>
+
+        <button
+            class="back"
+            onclick="showSubjects('${level}', '${cls}')">
+
+            ← Back
+
+        </button>
 
         <div class="welcome">
+
             <h2>${subject}</h2>
+
             <p>${cls}</p>
+
         </div>
 
         <div class="welcome">
+
             <h3>Past examination papers</h3>
-            <p>📄 Papers will be added here.</p>
+
+            <br>
+
+            <p>
+                📄 Papers will be added here.
+            </p>
+
         </div>
     `;
 }
+
 
 home();
 

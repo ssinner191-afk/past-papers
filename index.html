@@ -58,7 +58,8 @@
 
         .school-button,
         .class-button,
-        .subject-button {
+        .subject-button,
+        .year-button {
             width: 100%;
             border: none;
             border-radius: 15px;
@@ -79,6 +80,10 @@
         .school-button small {
             font-size: 15px;
             font-weight: normal;
+        }
+
+        .year-button {
+            font-size: 21px;
         }
 
         button:active {
@@ -103,6 +108,33 @@
             font-size: 13px;
             color: #777;
             font-weight: normal;
+        }
+
+        .paper-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+        }
+
+        .paper-box h3 {
+            margin-bottom: 10px;
+        }
+
+        .paper-box p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .view-button {
+            border: none;
+            background: #111827;
+            color: white;
+            padding: 14px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
         }
 
         footer {
@@ -153,27 +185,60 @@ const secondarySubjects = [
     "Additional Mathematics"
 ];
 
+const years = [
+    2025,
+    2024,
+    2023,
+    2022,
+    2021,
+    2020,
+    2019,
+    2018,
+    2017,
+    2016
+];
+
 const app = document.getElementById("app");
+
 
 function home() {
 
     app.innerHTML = `
+
         <div class="welcome">
+
             <h2>Welcome! 📚</h2>
+
             <p>Choose your school level</p>
+
         </div>
 
-        <button class="school-button" onclick="showClasses('primary')">
+
+        <button
+            class="school-button"
+            onclick="showClasses('primary')">
+
             🧒 PRIMARY
+
             <br>
+
             <small>P1 — P8</small>
+
         </button>
 
-        <button class="school-button" onclick="showClasses('secondary')">
+
+        <button
+            class="school-button"
+            onclick="showClasses('secondary')">
+
             🎓 SECONDARY
+
             <br>
+
             <small>S1 — S4</small>
+
         </button>
+
     `;
 }
 
@@ -182,39 +247,61 @@ function showClasses(level) {
 
     let classes = [];
 
+
     if (level === "primary") {
 
         for (let i = 1; i <= 8; i++) {
+
             classes.push("P" + i);
+
         }
 
     } else {
 
         for (let i = 1; i <= 4; i++) {
+
             classes.push("S" + i);
+
         }
 
     }
 
+
     let html = `
-        <button class="back" onclick="home()">← Back</button>
+
+        <button
+            class="back"
+            onclick="home()">
+
+            ← Back
+
+        </button>
+
 
         <div class="welcome">
 
             <h2>
-                ${level === "primary"
+
+                ${
+                    level === "primary"
                     ? "PRIMARY SCHOOL 📚"
-                    : "SECONDARY SCHOOL 🎓"}
+                    : "SECONDARY SCHOOL 🎓"
+                }
+
             </h2>
+
 
             <p>Choose your class</p>
 
         </div>
+
     `;
+
 
     classes.forEach(cls => {
 
         html += `
+
             <button
                 class="class-button"
                 onclick="showSubjects('${level}', '${cls}')">
@@ -222,9 +309,11 @@ function showClasses(level) {
                 ${cls}
 
             </button>
+
         `;
 
     });
+
 
     app.innerHTML = html;
 }
@@ -234,10 +323,12 @@ function showSubjects(level, cls) {
 
     const subjects =
         level === "primary"
-            ? primarySubjects
-            : secondarySubjects;
+        ? primarySubjects
+        : secondarySubjects;
+
 
     let html = `
+
         <button
             class="back"
             onclick="showClasses('${level}')">
@@ -246,6 +337,7 @@ function showSubjects(level, cls) {
 
         </button>
 
+
         <div class="welcome">
 
             <h2>${cls} 📚</h2>
@@ -253,50 +345,63 @@ function showSubjects(level, cls) {
             <p>Choose a subject</p>
 
         </div>
+
     `;
+
 
     subjects.forEach(subject => {
 
         let optionalText = "";
+
 
         if (
             subject === "Additional Mathematics" &&
             (cls === "S3" || cls === "S4")
         ) {
 
-            optionalText =
-                `<span class="optional">
+            optionalText = `
+
+                <span class="optional">
+
                     Optional subject
-                </span>`;
+
+                </span>
+
+            `;
 
         }
 
+
         html += `
+
             <button
                 class="subject-button"
-                onclick="openSubject('${cls}', '${subject}')">
+                onclick="showYears('${cls}', '${subject}')">
 
                 ${subject}
 
                 ${optionalText}
 
             </button>
+
         `;
 
     });
+
 
     app.innerHTML = html;
 }
 
 
-function openSubject(cls, subject) {
+function showYears(cls, subject) {
 
     const level =
         cls.startsWith("P")
-            ? "primary"
-            : "secondary";
+        ? "primary"
+        : "secondary";
 
-    app.innerHTML = `
+
+    let html = `
 
         <button
             class="back"
@@ -306,25 +411,91 @@ function openSubject(cls, subject) {
 
         </button>
 
+
         <div class="welcome">
 
             <h2>${subject}</h2>
 
             <p>${cls}</p>
 
+            <br>
+
+            <p>Choose examination year</p>
+
         </div>
+
+    `;
+
+
+    years.forEach(year => {
+
+        html += `
+
+            <button
+                class="year-button"
+                onclick="openPaper('${cls}', '${subject}', '${year}')">
+
+                📄 ${year}
+
+            </button>
+
+        `;
+
+    });
+
+
+    app.innerHTML = html;
+}
+
+
+function openPaper(cls, subject, year) {
+
+    const level =
+        cls.startsWith("P")
+        ? "primary"
+        : "secondary";
+
+
+    app.innerHTML = `
+
+        <button
+            class="back"
+            onclick="showYears('${cls}', '${subject}')">
+
+            ← Back
+
+        </button>
+
 
         <div class="welcome">
 
-            <h3>Past examination papers</h3>
+            <h2>${subject}</h2>
 
-            <br>
-
-            <p>
-                📄 Papers will be added here.
-            </p>
+            <p>${cls} • ${year}</p>
 
         </div>
+
+
+        <div class="paper-box">
+
+            <h3>📄 Examination Paper</h3>
+
+            <p>
+                The ${year} ${subject} paper for ${cls}
+                will appear here.
+            </p>
+
+
+            <button
+                class="view-button"
+                onclick="alert('The examination paper will be available here once it has been added.')">
+
+                View Paper
+
+            </button>
+
+        </div>
+
     `;
 }
 

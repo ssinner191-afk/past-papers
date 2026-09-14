@@ -137,6 +137,20 @@
             cursor: pointer;
         }
 
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+
+        .error {
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: #b91c1c;
+        }
+
         footer {
             text-align: center;
             padding: 30px 15px;
@@ -153,13 +167,56 @@
     <p>Study • Practice • Succeed</p>
 </header>
 
-<div class="container" id="app"></div>
+<div class="container" id="app">
+    <div class="loading">
+        Connecting to Past Papers...
+    </div>
+</div>
 
 <footer>
     © 2026 Past Papers 🇸🇸
 </footer>
 
-<script>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs
+}
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyAWKvT9xCxnQJb63ZzZrtuH2NDvkXSPRCo",
+
+    authDomain:
+        "past-papers-south-sudan.firebaseapp.com",
+
+    projectId:
+        "past-papers-south-sudan",
+
+    storageBucket:
+        "past-papers-south-sudan.firebasestorage.app",
+
+    messagingSenderId:
+        "194237142643",
+
+    appId:
+        "1:194237142643:web:7b259c4aed64c086e13c06"
+
+};
+
+
+const firebaseApp = initializeApp(firebaseConfig);
+
+const db = getFirestore(firebaseApp);
+
 
 const primarySubjects = [
     "English",
@@ -168,6 +225,7 @@ const primarySubjects = [
     "Social Studies",
     "CRE"
 ];
+
 
 const secondarySubjects = [
     "Biology",
@@ -185,20 +243,57 @@ const secondarySubjects = [
     "Additional Mathematics"
 ];
 
-const years = [
-    2025,
-    2024,
-    2023,
-    2022,
-    2021,
-    2020,
-    2019,
-    2018,
-    2017,
-    2016
-];
 
 const app = document.getElementById("app");
+
+
+let papers = [];
+
+
+async function loadPapers() {
+
+    try {
+
+        const snapshot =
+            await getDocs(collection(db, "papers"));
+
+        papers = [];
+
+        snapshot.forEach((doc) => {
+
+            papers.push({
+                id: doc.id,
+                ...doc.data()
+            });
+
+        });
+
+        home();
+
+    } catch (error) {
+
+        console.error(error);
+
+        app.innerHTML = `
+
+            <div class="error">
+
+                <h3>Unable to load papers</h3>
+
+                <br>
+
+                <p>
+                    Please check your internet connection
+                    and try again.
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
 
 
 function home() {
@@ -240,6 +335,7 @@ function home() {
         </button>
 
     `;
+
 }
 
 
@@ -290,7 +386,6 @@ function showClasses(level) {
 
             </h2>
 
-
             <p>Choose your class</p>
 
         </div>
@@ -316,6 +411,7 @@ function showClasses(level) {
 
 
     app.innerHTML = html;
+
 }
 
 
@@ -390,6 +486,7 @@ function showSubjects(level, cls) {
 
 
     app.innerHTML = html;
+
 }
 
 
@@ -399,6 +496,15 @@ function showYears(cls, subject) {
         cls.startsWith("P")
         ? "primary"
         : "secondary";
+
+
+    const matchingPapers =
+        papers.filter(paper =>
+
+            paper.class === cls &&
+            paper.subject === subject
+
+        );
 
 
     let html = `
@@ -420,38 +526,77 @@ function showYears(cls, subject) {
 
             <br>
 
-            <p>Choose examination year</p>
+            <p>Available examination papers</p>
 
         </div>
 
     `;
 
 
-    years.forEach(year => {
+    if (matchingPapers.length === 0) {
 
         html += `
 
-            <button
-                class="year-button"
-                onclick="openPaper('${cls}', '${subject}', '${year}')">
+            <div class="paper-box">
 
-                📄 ${year}
+                <h3>📄 No papers yet</h3>
 
-            </button>
+                <br>
+
+                <p>
+                    We haven't added a paper for
+                    this subject yet.
+                </p>
+
+            </div>
 
         `;
 
-    });
+    } else {
+
+        matchingPapers
+            .sort((a, b) =>
+                Number(b.year) - Number(a.year)
+            )
+            .forEach(paper => {
+
+                html += `
+
+                    <button
+                        class="year-button"
+                        onclick="openPaper('${paper.id}')">
+
+                        📄 ${paper.year}
+
+                    </button>
+
+                `;
+
+            });
+
+    }
 
 
     app.innerHTML = html;
+
 }
 
 
-function openPaper(cls, subject, year) {
+function openPaper(id) {
+
+    const paper =
+        papers.find(p => p.id === id);
+
+
+    if (!paper) {
+
+        return;
+
+    }
+
 
     const level =
-        cls.startsWith("P")
+        paper.class.startsWith("P")
         ? "primary"
         : "secondary";
 
@@ -460,7 +605,10 @@ function openPaper(cls, subject, year) {
 
         <button
             class="back"
-            onclick="showYears('${cls}', '${subject}')">
+            onclick="showYears(
+                '${paper.class}',
+                '${paper.subject}'
+            )">
 
             ← Back
 
@@ -469,38 +617,60 @@ function openPaper(cls, subject, year) {
 
         <div class="welcome">
 
-            <h2>${subject}</h2>
+            <h2>${paper.subject}</h2>
 
-            <p>${cls} • ${year}</p>
+            <p>
+                ${paper.class} • ${paper.year}
+            </p>
 
         </div>
 
 
         <div class="paper-box">
 
-            <h3>📄 Examination Paper</h3>
+            <h3>📄 ${paper.paperName}</h3>
 
-            <p>
-                The ${year} ${subject} paper for ${cls}
-                will appear here.
-            </p>
+            <br>
 
+            ${
+                paper.pdfUrl
+                ? `
+                    <a
+                        href="${paper.pdfUrl}"
+                        target="_blank">
 
-            <button
-                class="view-button"
-                onclick="alert('The examination paper will be available here once it has been added.')">
+                        <button class="view-button">
 
-                View Paper
+                            View Paper
 
-            </button>
+                        </button>
+
+                    </a>
+                `
+                :
+                `
+                    <p>
+                        The PDF for this paper
+                        has not been added yet.
+                    </p>
+                `
+            }
 
         </div>
 
     `;
+
 }
 
 
-home();
+window.home = home;
+window.showClasses = showClasses;
+window.showSubjects = showSubjects;
+window.showYears = showYears;
+window.openPaper = openPaper;
+
+
+loadPapers();
 
 </script>
 
